@@ -1,25 +1,41 @@
-import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import inference from './inference.js';
 
-function App() {
-  return (
-    <div className="App">
+
+class TextInputArea extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: 'Enter text to predict emotion for.',
+      emoji: 'Unknown 🙈',
+      score: 100
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {  
+    inference(event.target.value).then( result => {
+      this.setState({
+        text : event.target.value,
+        emoji: result[0],
+        score:result[1]
+      });
+    });
+  }
+
+  render() {
+    return (
+      <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>Predicted emotion:&nbsp; {this.state.emoji}</p>
+        <p>Predicted Confidence: {this.state.score}%</p>   
+        <textarea rows="8" cols="40" className="App-textarea" name="message" 
+        placeholder={this.state.text} autoFocus onChange={this.handleChange}>
+          </textarea> 
       </header>
-    </div>
-  );
+    </div>   
+    );
+  }
 }
-
-export default App;
+export default TextInputArea;
