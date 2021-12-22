@@ -7,7 +7,7 @@ class TextInputArea extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: 'Enter text to predict emotion for.',
+      text: 'Enter text (english only) to classify emotion',
       emoji: 'Unknown 🙈',
       score: 100
     };
@@ -28,11 +28,10 @@ class TextInputArea extends React.Component {
     return (
       <div className="App">
       <header className="App-header">
-        <p>Predicted emotion:&nbsp; {this.state.emoji}</p>
-        <p>Predicted Confidence: {this.state.score}%</p>   
-        <textarea rows="8" cols="40" className="App-textarea" name="message" 
-        placeholder={this.state.text} autoFocus onChange={this.handleChange}>
-          </textarea> 
+        <p>Predicted emotion:&nbsp; {this.state.emoji},&nbsp;Confidence {this.state.score}%</p>  
+        <textarea rows="8" cols="24" className="App-textarea" name="message" 
+          placeholder={this.state.text} autoFocus onChange={this.handleChange}>
+        </textarea> 
       </header>
     </div>   
     );

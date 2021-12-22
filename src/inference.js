@@ -15,7 +15,7 @@ const emotions = [
     'Fear 😱',
     'Surprise 😲'
 ]
-const empty_prediction = ['Unknown 🙈',0];
+const empty_prediction = ['Unknown 🙈',100];
 
 function argMax(arr) {
     if (arr.length === 0) {
