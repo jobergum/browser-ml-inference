@@ -7,31 +7,6 @@ const options = {executionProviders: ['wasm'], 'graphOptimizationLevel': 'all'};
 const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
 const tokenizer = loadTokenizer();
 
-const emotions = [
-    'Sadness 😥',
-    'Joy 😂',
-    'Love ❤️',
-    'Anger 😠',
-    'Fear 😱',
-    'Surprise 😲'
-]
-const empty_prediction = ['Unknown 🙈',100];
-
-function argMax(arr) {
-    if (arr.length === 0) {
-        return -1;
-    }
-    var max = arr[0];
-    var maxIndex = 0;
-    for (var i = 1; i < arr.length; i++) {
-        if (arr[i] > max) {
-            maxIndex = i;
-            max = arr[i];
-        }
-    }
-    return maxIndex;
-}
-
 function softMax(logits) {
     const maxLogit = Math.max(...logits);
     const scores = logits.map(l => Math.exp(l - maxLogit));
@@ -39,14 +14,25 @@ function softMax(logits) {
     return scores.map(s => s / denom);
 }
 
+const empty = [
+  ["Emotion", "Score"],
+  ['Sadness 😥',0],
+  ['Joy 😂', 0],
+  ['Love ❤️', 0],
+  ['Anger 😠', 0],
+  ['Fear 😱', 0],
+  ['Surprise 😲', 0]
+];
+
 async function lm_inference(text) {
     try { 
       const encoded = await tokenizer.then(t => {
         return t.tokenize(text); 
       });
-      if (encoded.length === 0) {
-          return empty_prediction;
+      if(encoded.length === 0) {
+        return empty;
       }
+
       var input_ids = new Array(encoded.length+2);
       var attention_mask = new Array(encoded.length+2);
       var token_type_ids = new Array(encoded.length+2);
@@ -75,16 +61,20 @@ async function lm_inference(text) {
       console.log("Inference latency = " + duration + "ms");
 
       const probs = softMax(output['output_0'].data);
-      const predictedLabel = argMax(probs);
-      const confidence = Math.floor(100*probs[predictedLabel]);
-      if (confidence < 20) {
-        return empty_prediction;
-      } else {
-        return [emotions[predictedLabel],confidence];
-      }
+      const emotions =
+       [
+        ["Emotion", "Score"],
+        ['Sadness 😥', Math.floor(100*probs[0])],
+        ['Joy 😂', Math.floor(100*probs[1])],
+        ['Love ❤️', Math.floor(100*probs[2])],
+        ['Anger 😠', Math.floor(100*probs[3])],
+        ['Fear 😱', Math.floor(100*probs[4])],
+        ['Surprise 😲', Math.floor(100*probs[5])],
+      ];
+      return emotions;
     } catch (e) {
-        return ["Inference failed",100];
+        return empty;
     }
 }    
 const inference = lm_inference;
-export default inference;
+export default inference
