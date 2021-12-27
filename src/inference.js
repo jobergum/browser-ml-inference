@@ -1,17 +1,25 @@
-/* global BigInt */
+/** */
+/*global BigInt */
 /*global BigInt64Array */
 
 import {loadTokenizer} from './bert_tokenizer.ts';
+
 const ort = require('onnxruntime-web');
-const options = {executionProviders: ['wasm'], 'graphOptimizationLevel': 'all'};
+ort.env.wasm.numThreads = 2;
+ort.env.wasm.simd = true;
+const options = {
+  executionProviders: ['wasm'], 
+  graphOptimizationLevel: 'all'
+};
+
 const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
-const tokenizer = loadTokenizer();
+const tokenizer = loadTokenizer()
 
 function softMax(logits) {
-    const maxLogit = Math.max(...logits);
-    const scores = logits.map(l => Math.exp(l - maxLogit));
-    const denom = scores.reduce((a, b) => a + b);
-    return scores.map(s => s / denom);
+  const maxLogit = Math.max(...logits);
+  const scores = logits.map(s => Math.exp(s - maxLogit));
+  const denom = scores.reduce((a, b) => a + b);
+  return scores.map(s => s / denom);
 }
 
 const empty = [
@@ -53,28 +61,27 @@ async function lm_inference(text) {
       input_ids = new ort.Tensor('int64', BigInt64Array.from(input_ids), [1,sequence_length]);
       attention_mask = new ort.Tensor('int64', BigInt64Array.from(attention_mask), [1,sequence_length]);
       token_type_ids = new ort.Tensor('int64', BigInt64Array.from(token_type_ids), [1,sequence_length]);
-      const start = Date.now();
+      const start = performance.now();
       const feeds = { input_ids: input_ids, token_type_ids: token_type_ids, attention_mask:attention_mask};
       const output =  await session.then(session => { return session.run(feeds,['output_0'])});
-      const duration = Date.now() - start;
+      const duration = performance.now() - start;
     
-      console.log("Inference latency = " + duration + "ms");
-
+      console.log("Inference latency = " + duration.toFixed(2) + "ms, sequence_length=" + sequence_length);
       const probs = softMax(output['output_0'].data);
-      const emotions =
-       [
+      const rounded_probs = probs.map( t => Math.floor(t*100));
+      return [
         ["Emotion", "Score"],
-        ['Sadness 😥', Math.floor(100*probs[0])],
-        ['Joy 😂', Math.floor(100*probs[1])],
-        ['Love ❤️', Math.floor(100*probs[2])],
-        ['Anger 😠', Math.floor(100*probs[3])],
-        ['Fear 😱', Math.floor(100*probs[4])],
-        ['Surprise 😲', Math.floor(100*probs[5])],
-      ];
-      return emotions;
+        ['Sadness 😥', rounded_probs[0]],
+        ['Joy 😂', rounded_probs[1]],
+        ['Love ❤️', rounded_probs[2]],
+        ['Anger 😠', rounded_probs[3]],
+        ['Fear 😱', rounded_probs[4]],
+        ['Surprise 😲', rounded_probs[5]],
+      ];    
     } catch (e) {
         return empty;
     }
 }    
-const inference = lm_inference;
-export default inference
+
+export let inference = lm_inference 
+export let columnNames = empty

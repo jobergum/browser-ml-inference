@@ -1,6 +1,6 @@
 {
-  "short_name": "Emoji",
-  "name": "Sample application of Transformers in Browser",
+  "short_name": "Emotion",
+  "name": "Inference with Transformers in the Browser",
   "icons": [],
   "start_url": ".",
   "display": "standalone",

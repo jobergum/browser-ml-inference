@@ -1,7 +1,8 @@
 import './App.css';
 
 import React from 'react';
-import inference from './inference.js';
+import {inference} from './inference.js';
+import {columnNames} from './inference.js';
 import Chart from "react-google-charts";
 
 class TextInputArea extends React.Component {
@@ -9,15 +10,7 @@ class TextInputArea extends React.Component {
     super(props);
     this.state = {
       text: 'Enter text to classify emotion (Model trained for English)',
-      data:[
-        ["Emotion", "Score"],
-        ['Sadness 😥',0],
-        ['Joy 😂', 0],
-        ['Love ❤️', 0],
-        ['Anger 😠', 0],
-        ['Fear 😱', 0],
-        ['Surprise 😲', 0]
-      ]
+      data:columnNames
     }
     this.handleChange = this.handleChange.bind(this);
   }
@@ -35,6 +28,7 @@ class TextInputArea extends React.Component {
     return (
       <div className="App">
       <header className="App-header">   
+      <p>Transformer NLP Inference</p>
       <Chart  
         width={'400px'}
         height={'200px'}
@@ -62,9 +56,9 @@ class TextInputArea extends React.Component {
           }
       }}
       /> 
-        <textarea rows="8" cols="24" className="App-textarea" name="message" 
-          placeholder={this.state.text} autoFocus onChange={this.handleChange}>
-        </textarea> 
+      <textarea rows="8" cols="24" className="App-textarea" name="message" 
+       placeholder={this.state.text} autoFocus onChange={this.handleChange}>
+      </textarea> 
       </header>
     </div>   
     );
