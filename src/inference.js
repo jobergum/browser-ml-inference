@@ -38,7 +38,7 @@ async function lm_inference(text) {
         return t.tokenize(text); 
       });
       if(encoded.length === 0) {
-        return empty;
+        return [0.0,empty];
       }
 
       var input_ids = new Array(encoded.length+2);
@@ -64,12 +64,12 @@ async function lm_inference(text) {
       const start = performance.now();
       const feeds = { input_ids: input_ids, token_type_ids: token_type_ids, attention_mask:attention_mask};
       const output =  await session.then(session => { return session.run(feeds,['output_0'])});
-      const duration = performance.now() - start;
-    
-      console.log("Inference latency = " + duration.toFixed(2) + "ms, sequence_length=" + sequence_length);
+      const duration = (performance.now() - start).toFixed(1);
+      
+      console.log("Inference latency = " + duration + "ms, sequence_length=" + sequence_length);
       const probs = softMax(output['output_0'].data);
       const rounded_probs = probs.map( t => Math.floor(t*100));
-      return [
+      return [duration,[
         ["Emotion", "Score"],
         ['Sadness 😥', rounded_probs[0]],
         ['Joy 😂', rounded_probs[1]],
@@ -77,7 +77,7 @@ async function lm_inference(text) {
         ['Anger 😠', rounded_probs[3]],
         ['Fear 😱', rounded_probs[4]],
         ['Surprise 😲', rounded_probs[5]],
-      ];    
+      ]];    
     } catch (e) {
         return empty;
     }

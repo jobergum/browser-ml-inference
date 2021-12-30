@@ -10,7 +10,8 @@ class TextInputArea extends React.Component {
     super(props);
     this.state = {
       text: 'Enter text to classify emotion (Model trained for English)',
-      data:columnNames
+      data:columnNames,
+      latency:0.0
     }
     this.handleChange = this.handleChange.bind(this);
   }
@@ -19,7 +20,8 @@ class TextInputArea extends React.Component {
     inference(event.target.value).then( result => {
       this.setState({
         text : event.target.value,
-        data:result
+        data:result[1],
+        latency:result[0]
       });
     });
   }
@@ -56,6 +58,7 @@ class TextInputArea extends React.Component {
           }
       }}
       /> 
+      <div><font size="2">BERT Inference Latency {this.state.latency} ms</font></div>
       <textarea rows="8" cols="24" className="App-textarea" name="message" 
        placeholder={this.state.text} autoFocus onChange={this.handleChange}>
       </textarea> 
