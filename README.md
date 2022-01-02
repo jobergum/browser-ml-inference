@@ -1,10 +1,43 @@
-# Getting Started with Create React App
+# Text Emotion Prediction in Browser
+
+This React App demonstrates NLP Inference in the Browser using
+
+- [Cloudfare Pages](https://pages.cloudflare.com/) to deliver this app and model
+- [ONNX Runtime Web](https://onnxruntime.ai/) for Model Inference
+- [Huggingface](https://huggingface.co/bergum/xtremedistil-emotion) for model hosting and training api
+- [Google Colab](https://colab.research.google.com/) for model training 
+
+Live demo at [https://aiserv.cloud/](https://aiserv.cloud/). 
+
+The model is a fine-tuned version of [microsoft/xtremedistil-l6-h256-uncased](https://huggingface.co/microsoft/xtremedistil-l6-h256-uncased) on the [emotion dataset](https://huggingface.co/datasets/emotion).
+
+Emotion is a dataset of English Twitter messages with six basic emotions: anger, fear, joy, love, sadness, and surprise.
+The dataset has 16,000 labeled examples which the model was trained on.
+
+The model achieves the following results on the Emotion evaluation set:
+- Accuracy: 92.65% (float32) version (49MB)
+- Accuracy: 81.95% (Quantized int8) version (13MB)
+
+See [TrainEmotions.ipynb Notebook](TrainEmotions.ipynb) for Training routine and accuracy evaluation using PyTorch
+and ONNX-Runtime wwith both float32 and int8 weights. 
+
+Since Cloudfare page limit static asset files to maxium 25MB we use the int8 version with lower accuracy. 
+
+See [ONNX Runtime Web Examples](https://microsoft.github.io/onnxruntime-web-demo/#/) for more examples
+of model inference. See also [ONNX Runtime Web—running your machine learning model in browser](https://cloudblogs.microsoft.com/opensource/2021/09/02/onnx-runtime-web-running-your-machine-learning-model-in-browser/) 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Language Model Bias
+The pre-trained language model was trained on text which will contain biases from the real world, 
+see [On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?](https://dl.acm.org/doi/10.1145/3442188.3445922) for a great study on the dangers of pre-trained language models and transfer learning. The fine-tuned model
+was tuned on a rather small dataset of 16,000 labeled exampels and the bias in both the pre-trained model is inherited by 
+the fine tuned model.  
 
-In the project directory, you can run:
+## Running this app 
+Install Node.js/npm, see [Installing Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+
+In the project directory, you can run: 
 
 ### `npm start`
 
@@ -14,57 +47,11 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
 ### `npm run build`
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## TODO 
+- Fix build to copy wasm files from node_modules to build to avoid having wasm files under source control.  
