@@ -7,7 +7,7 @@ This React App demonstrates NLP Inference in the Browser using
 - [Huggingface](https://huggingface.co/bergum/xtremedistil-emotion) for model hosting and training api
 - [Google Colab](https://colab.research.google.com/) for model training 
 
-Live demo at [https://aiserv.cloud/](https://aiserv.cloud/). 
+Live demo at [https://aiserv.cloud/](https://aiserv.cloud/). See also my [blog post](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4).
 
 The model is a fine-tuned version of [microsoft/xtremedistil-l6-h256-uncased](https://huggingface.co/microsoft/xtremedistil-l6-h256-uncased) on the [emotion dataset](https://huggingface.co/datasets/emotion).
 
