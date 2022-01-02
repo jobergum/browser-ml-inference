@@ -65,6 +65,7 @@ class TextInputArea extends React.Component {
        <div><font size="2">Inference Latency {this.state.latency} ms</font></div>
       }
       <div><font size="2"><a href="https://huggingface.co/bergum/xtremedistil-emotion">🤗 Emotion model</a></font></div>
+      <div><font size="2"><a href="https://github.com/jobergum/emotion">Github repo</a></font></div>
       </header>
     </div>   
     );
