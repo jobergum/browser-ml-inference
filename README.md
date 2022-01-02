@@ -18,6 +18,8 @@ The model achieves the following results on the Emotion evaluation set:
 - Accuracy: 92.65% (float32) version (49MB)
 - Accuracy: 81.95% (Quantized int8) version (13MB)
 
+The model is hosted on [Huggingface:bergum/xtremedistil-emotion](https://huggingface.co/bergum/xtremedistil-emotion). 
+
 See [TrainEmotions.ipynb Notebook](TrainEmotions.ipynb) for Training routine and accuracy evaluation using PyTorch
 and ONNX-Runtime wwith both float32 and int8 weights. 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainEmotions.ipynb)
@@ -25,9 +27,15 @@ and ONNX-Runtime wwith both float32 and int8 weights.
 Since Cloudfare page limit static asset files to maxium 25MB we use the int8 version with lower accuracy. 
 
 See [ONNX Runtime Web Examples](https://microsoft.github.io/onnxruntime-web-demo/#/) for more examples
-of model inference. See also [ONNX Runtime Web—running your machine learning model in browser](https://cloudblogs.microsoft.com/opensource/2021/09/02/onnx-runtime-web-running-your-machine-learning-model-in-browser/) 
+of model inference. See also [ONNX Runtime Web—running your machine learning model in browser](https://cloudblogs.microsoft.com/opensource/2021/09/02/onnx-runtime-web-running-your-machine-learning-model-in-browser/). 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Code Navigation
+
+- The App frontend logic is in [src/App.js](src/App.js)
+- The model inference logic is in [src/inference.js](src/inference.js)
+- The tokenizer is in [src/bert_tokenizer.js](src/bert_tokenizer.ts) which is a copy of [Google TFJS](https://raw.githubusercontent.com/tensorflow/tfjs-models/master/qna/src/bert_tokenizer.ts) (Apache 2.0)
 
 ## Language Model Bias
 The pre-trained language model was trained on text with biases, 
@@ -53,6 +61,10 @@ You may also see any lint errors in the console.
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
+### Deploying app
+Clone this repo and use Cloudfare Pages. 
 
 ## TODO 
 - Fix build to copy wasm files from node_modules to build to avoid having wasm files under source control.  
+- PR and feedback welcome - create an issue to get in contact. 
+
