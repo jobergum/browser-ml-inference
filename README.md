@@ -2,7 +2,7 @@
 
 This React App demonstrates NLP Inference in the Browser using
 
-- [Cloudfare Pages](https://pages.cloudflare.com/) to deliver this app and model
+- [Cloudfare Pages](https://pages.cloudflare.com/) to deliver this app and model with CDN
 - [ONNX Runtime Web](https://onnxruntime.ai/) for Model Inference
 - [Huggingface](https://huggingface.co/bergum/xtremedistil-emotion) for model hosting and training api
 - [Google Colab](https://colab.research.google.com/) for model training 
@@ -20,6 +20,7 @@ The model achieves the following results on the Emotion evaluation set:
 
 See [TrainEmotions.ipynb Notebook](TrainEmotions.ipynb) for Training routine and accuracy evaluation using PyTorch
 and ONNX-Runtime wwith both float32 and int8 weights. 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainEmotions.ipynb)
 
 Since Cloudfare page limit static asset files to maxium 25MB we use the int8 version with lower accuracy. 
 
@@ -29,9 +30,9 @@ of model inference. See also [ONNX Runtime Web—running your machine learning m
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Language Model Bias
-The pre-trained language model was trained on text which will contain biases from the real world, 
-see [On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?](https://dl.acm.org/doi/10.1145/3442188.3445922) for a great study on the dangers of pre-trained language models and transfer learning. The fine-tuned model
-was tuned on a rather small dataset of 16,000 labeled exampels and the bias in both the pre-trained model is inherited by 
+The pre-trained language model was trained on text with biases, 
+see [On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?](https://dl.acm.org/doi/10.1145/3442188.3445922) for a study on the dangers of pre-trained language models and transfer learning. The fine-tuned model
+was tuned on a rather small dataset of 16,000 labeled examples and the bias in the pre-trained model is inherited by 
 the fine tuned model.  
 
 ## Running this app 
