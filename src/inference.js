@@ -13,10 +13,8 @@ const options = {
   graphOptimizationLevel: 'all'
 };
 
-//const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
-const session = ort.InferenceSession.create('./xtremedistil.onnx', options);
+const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
 const tokenizer = loadTokenizer()
-
 const empty = [
   ["Emotion", "Score"],
   ['Sadness 😥',0],
