@@ -30,7 +30,7 @@ class TextInputArea extends React.Component {
     return (
       <div className="App">
       <header className="App-header">   
-      <p>Transformer NLP Inference</p>
+      <p>In-Browser NLP Inference</p>
       <Chart  
         width={'400px'}
         height={'200px'}
@@ -57,11 +57,14 @@ class TextInputArea extends React.Component {
             }
           }
       }}
-      /> 
-      <div><font size="2">BERT Inference Latency {this.state.latency} ms</font></div>
+      />  
       <textarea rows="8" cols="24" className="App-textarea" name="message" 
        placeholder={this.state.text} autoFocus onChange={this.handleChange}>
-      </textarea> 
+      </textarea>
+      {this.state.latency > 0 && 
+       <div><font size="2">Inference Latency {this.state.latency} ms</font></div>
+      }
+      <div><font size="2"><a href="https://huggingface.co/bergum/xtremedistil-emotion">🤗 Emotion model</a></font></div>
       </header>
     </div>   
     );

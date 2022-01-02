@@ -2,25 +2,20 @@
 /*global BigInt */
 /*global BigInt64Array */
 
-import {loadTokenizer} from './bert_tokenizer.ts';
+import { loadTokenizer } from './bert_tokenizer.ts';
 
 const ort = require('onnxruntime-web');
-ort.env.wasm.numThreads = 2;
+ort.env.wasm.numThreads = 1;
 ort.env.wasm.simd = true;
+
 const options = {
   executionProviders: ['wasm'], 
   graphOptimizationLevel: 'all'
 };
 
-const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
+//const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
+const session = ort.InferenceSession.create('./xtremedistil.onnx', options);
 const tokenizer = loadTokenizer()
-
-function softMax(logits) {
-  const maxLogit = Math.max(...logits);
-  const scores = logits.map(s => Math.exp(s - maxLogit));
-  const denom = scores.reduce((a, b) => a + b);
-  return scores.map(s => s / denom);
-}
 
 const empty = [
   ["Emotion", "Score"],
@@ -32,40 +27,54 @@ const empty = [
   ['Surprise 😲', 0]
 ];
 
+function softMax(logits) {
+  const maxLogit = Math.max(...logits);
+  const scores = logits.map(s => Math.exp(s - maxLogit));
+  const denom = scores.reduce((a, b) => a + b);
+  return scores.map(s => s / denom);
+}
+
+
+function create_model_input(encoded) {
+  var input_ids = new Array(encoded.length+2);
+  var attention_mask = new Array(encoded.length+2);
+  var token_type_ids = new Array(encoded.length+2);
+  input_ids[0] = BigInt(101);
+  attention_mask[0] = BigInt(1);
+  token_type_ids[0] = BigInt(0);
+  var i = 0;
+  for(; i < encoded.length; i++) { 
+    input_ids[i+1] = BigInt(encoded[i]);
+    attention_mask[i+1] = BigInt(1);
+    token_type_ids[i+1] = BigInt(0);
+  }
+  input_ids[i+1] = BigInt(102);
+  attention_mask[i+1] = BigInt(1);
+  token_type_ids[i+1] = BigInt(0);
+  const sequence_length = input_ids.length;
+  input_ids = new ort.Tensor('int64', BigInt64Array.from(input_ids), [1,sequence_length]);
+  attention_mask = new ort.Tensor('int64', BigInt64Array.from(attention_mask), [1,sequence_length]);
+  token_type_ids = new ort.Tensor('int64', BigInt64Array.from(token_type_ids), [1,sequence_length]);
+  return {
+    input_ids: input_ids,
+    attention_mask: attention_mask,
+    token_type_ids:token_type_ids
+  }
+}
+
 async function lm_inference(text) {
     try { 
-      const encoded = await tokenizer.then(t => {
+      const encoded_ids = await tokenizer.then(t => {
         return t.tokenize(text); 
       });
-      if(encoded.length === 0) {
-        return [0.0,empty];
+      if(encoded_ids.length === 0) {
+        return [0.0, empty];
       }
-
-      var input_ids = new Array(encoded.length+2);
-      var attention_mask = new Array(encoded.length+2);
-      var token_type_ids = new Array(encoded.length+2);
-
-      input_ids[0] = BigInt(101);
-      attention_mask[0] = BigInt(1);
-      token_type_ids[0] = BigInt(0);
-      var i = 0;
-      for(; i < encoded.length; i++) { 
-        input_ids[i+1] = BigInt(encoded[i]);
-        attention_mask[i+1] = BigInt(1);
-        token_type_ids[i+1] = BigInt(0);
-      }
-      input_ids[i+1] = BigInt(102);
-      attention_mask[i+1] = BigInt(1);
-      token_type_ids[i+1] = BigInt(0);
-      const sequence_length = input_ids.length;
-      input_ids = new ort.Tensor('int64', BigInt64Array.from(input_ids), [1,sequence_length]);
-      attention_mask = new ort.Tensor('int64', BigInt64Array.from(attention_mask), [1,sequence_length]);
-      token_type_ids = new ort.Tensor('int64', BigInt64Array.from(token_type_ids), [1,sequence_length]);
+      const model_input = create_model_input(encoded_ids);
       const start = performance.now();
-      const feeds = { input_ids: input_ids, token_type_ids: token_type_ids, attention_mask:attention_mask};
-      const output =  await session.then(session => { return session.run(feeds,['output_0'])});
+      const output =  await session.then(s => { return s.run(model_input,['output_0'])});
       const duration = (performance.now() - start).toFixed(1);
-      
+      const sequence_length = model_input['input_ids'].length;
       console.log("Inference latency = " + duration + "ms, sequence_length=" + sequence_length);
       const probs = softMax(output['output_0'].data);
       const rounded_probs = probs.map( t => Math.floor(t*100));
@@ -79,7 +88,7 @@ async function lm_inference(text) {
         ['Surprise 😲', rounded_probs[5]],
       ]];    
     } catch (e) {
-        return empty;
+        return [0.0,empty];
     }
 }    
 
