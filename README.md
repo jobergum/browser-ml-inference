@@ -1,11 +1,11 @@
 # Text Emotion Prediction in Browser
 
-This React App demonstrates NLP Inference in the Browser using
+This React App demonstrates ML Inference in the Browser using
 
-- [Cloudfare Pages](https://pages.cloudflare.com/) to deliver this app and model with CDN
-- [ONNX Runtime Web](https://onnxruntime.ai/) for Model Inference
-- [Huggingface](https://huggingface.co/bergum/xtremedistil-emotion) for model hosting and training api
-- [Google Colab](https://colab.research.google.com/) for model training 
+- [Cloudflare Pages](https://pages.cloudflare.com/) to deliver this app and model via worldwide Content Delivery Network (CDN)
+- [ONNX Runtime Web](https://onnxruntime.ai/) for Model Inference in the Browser
+- [Huggingface](https://huggingface.co/bergum/xtremedistil-emotion) for NLP model hosting and training api
+- [Google Colab](https://colab.research.google.com/) for performing model training 
 
 Live demo at [https://aiserv.cloud/](https://aiserv.cloud/). See also my [blog post](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4).
 
@@ -24,10 +24,10 @@ See [TrainEmotions.ipynb Notebook](TrainEmotions.ipynb) for Training routine and
 and ONNX-Runtime wwith both float32 and int8 weights. 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainEmotions.ipynb)
 
-Since Cloudfare page limit static asset files to maxium 25MB we use the int8 version with lower accuracy. 
+Since Cloudflare page limit static asset files to maxium 25MB the deployed model version uses int8 weights. 
 
 See [ONNX Runtime Web Examples](https://microsoft.github.io/onnxruntime-web-demo/#/) for more examples
-of model inference. See also [ONNX Runtime Web—running your machine learning model in browser](https://cloudblogs.microsoft.com/opensource/2021/09/02/onnx-runtime-web-running-your-machine-learning-model-in-browser/). 
+of in-Browser model inference. See also [ONNX Runtime Web—running your machine learning model in browser](https://cloudblogs.microsoft.com/opensource/2021/09/02/onnx-runtime-web-running-your-machine-learning-model-in-browser/). 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
