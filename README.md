@@ -21,7 +21,7 @@ The model achieves the following results on the Emotion evaluation set:
 The model is hosted on [Huggingface:bergum/xtremedistil-emotion](https://huggingface.co/bergum/xtremedistil-emotion). 
 
 See [TrainEmotions.ipynb Notebook](TrainEmotions.ipynb) for Training routine and accuracy evaluation using PyTorch
-and ONNX-Runtime wwith both float32 and int8 weights. 
+and ONNX-Runtime with both float32 and int8 weights. 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainEmotions.ipynb)
 
 Since Cloudflare page limit static asset files to maxium 25MB the deployed model version uses int8 weights. 
