@@ -55,12 +55,12 @@ class TextInputArea extends React.Component {
       <header className="App-header">   
       <em>In-Browser NLP Inference</em>
       <Chart  
-        width={'500px'}
-        height={'350px'}
+        width={'400px'}
+        height={'200px'}
         chartType="BarChart"
         data={this.state.data}
         options={{
-          chartArea: { width: '55%'},
+          chartArea: { width: '50%'},
           colors: ['purple'],
           backgroundColor: '#282c34',
           legend: { 
