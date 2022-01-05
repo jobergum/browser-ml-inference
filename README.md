@@ -10,7 +10,7 @@ This React App demonstrates ML Inference in the Browser using
 Live demo at [https://aiserv.cloud/](https://aiserv.cloud/) 
 
 <p align="center">
-  <img src="go-emotion.png" />
+  <img src="GoEmotions.gif" />
 </p>
 
 See also my blog post [Moving ML Inference from the Cloud to the Edge](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4).

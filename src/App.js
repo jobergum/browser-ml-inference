@@ -60,7 +60,7 @@ class TextInputArea extends React.Component {
         chartType="BarChart"
         data={this.state.data}
         options={{
-          chartArea: { width: '50%'},
+          chartArea: { width: '40%'},
           colors: ['purple'],
           backgroundColor: '#282c34',
           legend: { 
