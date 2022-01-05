@@ -2,46 +2,70 @@
 
 This React App demonstrates ML Inference in the Browser using
 
-- [Cloudflare Pages](https://pages.cloudflare.com/) to deliver this app and model via worldwide Content Delivery Network (CDN)
-- [ONNX Runtime Web](https://onnxruntime.ai/) for Model Inference in the Browser
-- [Huggingface](https://huggingface.co/bergum/xtremedistil-emotion) for NLP model hosting and training api
-- [Google Colab](https://colab.research.google.com/) for performing model training 
+- [Cloudflare Pages](https://pages.cloudflare.com/) to deliver the React app and model via worldwide Content Delivery Network (CDN)
+- [ONNX Runtime Web](https://onnxruntime.ai/) for model inference in the Browser
+- [Huggingface](https://huggingface.co/bergum/xtremedistil-l6-h384-go-emotion) for NLP model hosting and training API (Transformer library) 
+- [Google Colab](https://colab.research.google.com/) for model training using GPU instances 
 
-Live demo at [https://aiserv.cloud/](https://aiserv.cloud/). See also my [blog post](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4).
+Live demo at [https://aiserv.cloud/](https://aiserv.cloud/) 
 
-The model is a fine-tuned version of [microsoft/xtremedistil-l6-h256-uncased](https://huggingface.co/microsoft/xtremedistil-l6-h256-uncased) on the [emotion dataset](https://huggingface.co/datasets/emotion).
+<p align="center">
+  <img src="go-emotion.png" />
+</p>
 
-Emotion is a dataset of English Twitter messages with six basic emotions: anger, fear, joy, love, sadness, and surprise.
-The dataset has 16,000 labeled examples which the model was trained on.
+See also my blog post [Moving ML Inference from the Cloud to the Edge](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4).
 
-The model achieves the following results on the Emotion evaluation set:
-- Accuracy: 92.65% (float32) version (49MB)
-- Accuracy: 81.95% (Quantized int8) version (13MB)
+The emotion prediction model is a fine-tuned version of the pre-trained language model 
+[microsoft/xtremedistil-l6-h256-uncased](https://huggingface.co/microsoft/xtremedistil-l6-h256-uncased). 
+The model has been fine-tuned on the [GoEmotions dataset](https://ai.googleblog.com/2021/10/goemotions-dataset-for-fine-grained.html) which is a multi-label 
+text categorization problem. 
 
-The model is hosted on [Huggingface:bergum/xtremedistil-emotion](https://huggingface.co/bergum/xtremedistil-emotion). 
 
-See [TrainEmotions.ipynb Notebook](TrainEmotions.ipynb) for Training routine and accuracy evaluation using PyTorch
-and ONNX-Runtime with both float32 and int8 weights. 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainEmotions.ipynb)
+>GoEmotions, a human-annotated dataset of 58k Reddit comments extracted from popular English-language subreddits and labeled with 27 emotion categories . As the largest fully annotated English language fine-grained emotion dataset to date. In contrast to the basic six emotions, which include only one  positive emotion (joy), the taxonomy includes 12 positive, 11 negative, 4 ambiguous emotion categories and 1 “neutral”, making it widely suitable for conversation understanding tasks that require a subtle differentiation between emotion expressions.
 
-Since Cloudflare page limit static asset files to maxium 25MB the deployed model version uses int8 weights. 
+Paper [GoEmotions: A Dataset of Fine-Grained Emotions](https://arxiv.org/pdf/2005.00547.pdf)
 
-See [ONNX Runtime Web Examples](https://microsoft.github.io/onnxruntime-web-demo/#/) for more examples
-of in-Browser model inference. See also [ONNX Runtime Web—running your machine learning model in browser](https://cloudblogs.microsoft.com/opensource/2021/09/02/onnx-runtime-web-running-your-machine-learning-model-in-browser/). 
+- The fine-tuned model is hosted on [Huggingface:bergum/xtremedistil-l6-h384-go-emotion](https://huggingface.co/bergum/xtremedistil-l6-h384-go-emotion). 
+- The dataset is available on [Huggingface dataset hub](https://huggingface.co/datasets/go_emotions). 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+See [TrainGoEmotions.ipynb](TrainGoEmotions.ipynb ) for how to train a model on the dataset and export the fine-tuned model to ONNX. 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainGoEmotions.ipynb)
+
+## ONNX-Runtime-web
+The model is quantized to int8 weights and has 22M trainable parameters and is 22MB large. Inference is multi-threaded. To use
+multiple inference threads, specific http headers must be presented by the CDN, see 
+[Making your website "cross-origin isolated" using COOP and COEP](https://web.dev/coop-coep/). Three threads are used for inference. 
+
+For development, the [src/setupProxy.js](src/setupProxy) adds the required headers. 
+See [react issue 10210](https://github.com/facebook/create-react-app/issues/10210)
 
 ## Code Navigation
-
 - The App frontend logic is in [src/App.js](src/App.js)
 - The model inference logic is in [src/inference.js](src/inference.js)
 - The tokenizer is in [src/bert_tokenizer.js](src/bert_tokenizer.ts) which is a copy of [Google TFJS](https://raw.githubusercontent.com/tensorflow/tfjs-models/master/qna/src/bert_tokenizer.ts) (Apache 2.0)
+- Cloudflare header override for cross-origin coop policy to enable multi threaded inference [public/_header](public/_headers). 
 
-## Language Model Bias
+## Model and Language Biases
 The pre-trained language model was trained on text with biases, 
-see [On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?](https://dl.acm.org/doi/10.1145/3442188.3445922) for a study on the dangers of pre-trained language models and transfer learning. The fine-tuned model
-was tuned on a rather small dataset of 16,000 labeled examples and the bias in the pre-trained model is inherited by 
-the fine tuned model.  
+see [On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?](https://dl.acm.org/doi/10.1145/3442188.3445922) 
+for a study on the dangers of pre-trained language models and transfer learning. 
+
+From dataset paper [GoEmotions: A Dataset of Fine-Grained Emotions](https://arxiv.org/pdf/2005.00547.pdf):
+>Data Disclaimer: We are aware that the dataset
+contains biases and is not representative of global
+diversity. We are aware that the dataset contains
+potentially problematic content. Potential biases in
+the data include: Inherent biases in Reddit and user
+base biases, the offensive/vulgar word lists used
+for data filtering, inherent or unconscious bias in
+assessment of offensive identity labels, annotators
+were all native English speakers from India. All
+these likely affect labeling, precision, and recall
+for a trained model. The emotion pilot model used
+for sentiment labeling, was trained on examples
+reviewed by the research team. Anyone using this
+dataset should be aware of these limitations of the
+dataset.
 
 ## Running this app 
 Install Node.js/npm, see [Installing Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)

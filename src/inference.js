@@ -4,8 +4,10 @@
 
 import { loadTokenizer } from './bert_tokenizer.ts';
 
+//Setup onnxruntime 
 const ort = require('onnxruntime-web');
-ort.env.wasm.numThreads = 1;
+//requires Cross-Origin-*-policy headers https://web.dev/coop-coep/
+ort.env.wasm.numThreads = 3; 
 ort.env.wasm.simd = true;
 
 const options = {
@@ -13,25 +15,77 @@ const options = {
   graphOptimizationLevel: 'all'
 };
 
-const session = ort.InferenceSession.create('./xtremedistil-int8.onnx', options);
+var downLoadingModel = true;
+const model = "./xtremedistill-go-emotion-int8.onnx";
+
+const session = ort.InferenceSession.create(model, options);
+session.then(t => { 
+  downLoadingModel = false;
+  //warmup the Virtual Machine tata
+  for(var i = 0; i < 10; i++) {
+    lm_inference("this is a warmup inference");
+  }
+});
+
 const tokenizer = loadTokenizer()
-const empty = [
+
+const EMOJI_DEFAULT_DISPLAY = [
   ["Emotion", "Score"],
-  ['Sadness 😥',0],
-  ['Joy 😂', 0],
-  ['Love ❤️', 0],
-  ['Anger 😠', 0],
-  ['Fear 😱', 0],
-  ['Surprise 😲', 0]
+  ['admiration 👏',0],
+  ['amusement 😂', 0],
+  ['neutral 😐',0],
+  ['approval 👍',0],
+  ['joy 😃',0],
+  ['gratitude 🙏',0],
 ];
 
-function softMax(logits) {
-  const maxLogit = Math.max(...logits);
-  const scores = logits.map(s => Math.exp(s - maxLogit));
-  const denom = scores.reduce((a, b) => a + b);
-  return scores.map(s => s / denom);
+const EMOJIS = [
+  'admiration 👏',
+  'amusement 😂',
+  'anger 😡',
+  'annoyance 😒',
+  'approval 👍',
+  'caring 🤗',
+  'confusion 😕',
+  'curiosity 🤔',
+  'desire 😍',
+  'disappointment 😞',
+  'disapproval 👎',
+  'disgust 🤮',
+  'embarrassment 😳',
+  'excitement 🤩',
+  'fear 😨',
+  'gratitude 🙏',
+  'grief 😢',
+  'joy 😃',
+  'love ❤️',
+  'nervousness 😬',
+  'optimism 🤞',
+  'pride 😌',
+  'realization 💡',
+  'relief😅',
+  'remorse 😞', 
+  'sadness 😞',
+  'surprise 😲',
+  'neutral 😐'
+];
+
+function isDownloading() {
+  return downLoadingModel;
 }
 
+function sortResult(a, b) {
+  if (a[1] === b[1]) {
+      return 0;
+  }
+  else {
+      return (a[1] < b[1]) ? 1 : -1;
+  }
+}
+
+function sigmoid(t) {
+  return 1/(1+Math.pow(Math.E, -t));
+}
 
 function create_model_input(encoded) {
   var input_ids = new Array(encoded.length+2);
@@ -61,34 +115,39 @@ function create_model_input(encoded) {
 }
 
 async function lm_inference(text) {
-    try { 
-      const encoded_ids = await tokenizer.then(t => {
-        return t.tokenize(text); 
-      });
-      if(encoded_ids.length === 0) {
-        return [0.0, empty];
-      }
-      const model_input = create_model_input(encoded_ids);
-      const start = performance.now();
-      const output =  await session.then(s => { return s.run(model_input,['output_0'])});
-      const duration = (performance.now() - start).toFixed(1);
-      const sequence_length = model_input['input_ids'].length;
-      console.log("Inference latency = " + duration + "ms, sequence_length=" + sequence_length);
-      const probs = softMax(output['output_0'].data);
-      const rounded_probs = probs.map( t => Math.floor(t*100));
-      return [duration,[
-        ["Emotion", "Score"],
-        ['Sadness 😥', rounded_probs[0]],
-        ['Joy 😂', rounded_probs[1]],
-        ['Love ❤️', rounded_probs[2]],
-        ['Anger 😠', rounded_probs[3]],
-        ['Fear 😱', rounded_probs[4]],
-        ['Surprise 😲', rounded_probs[5]],
-      ]];    
-    } catch (e) {
-        return [0.0,empty];
+  try { 
+    const encoded_ids = await tokenizer.then(t => {
+      return t.tokenize(text); 
+    });
+    if(encoded_ids.length === 0) {
+      return [0.0, EMOJI_DEFAULT_DISPLAY];
     }
+    const model_input = create_model_input(encoded_ids);
+    const start = performance.now();
+    const output =  await session.then(s => { return s.run(model_input,['output_0'])});
+    const duration = (performance.now() - start).toFixed(1);
+    //const sequence_length = model_input['input_ids'].size;
+    //console.log("Inference latency = " + duration + "ms, sequence_length=" + sequence_length);
+    const probs = output['output_0'].data.map(sigmoid).map( t => Math.floor(t*100));
+    
+    const result = [];
+    for(var i = 0; i < EMOJIS.length;i++) {
+      const t = [EMOJIS[i], probs[i]];
+      result[i] = t;
+    }
+    result.sort(sortResult); 
+    
+    const result_list = [];
+    result_list[0] = ["Emotion", "Score"];
+    for(i = 0; i < 6; i++) {
+       result_list[i+1] = result[i];
+    }
+    return [duration,result_list];    
+  } catch (e) {
+    return [0.0,EMOJI_DEFAULT_DISPLAY];
+  }
 }    
 
 export let inference = lm_inference 
-export let columnNames = empty
+export let columnNames = EMOJI_DEFAULT_DISPLAY
+export let modelDownloadInProgress = isDownloading
