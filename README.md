@@ -86,7 +86,7 @@ Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 ### Deploying app
-Clone this repo and use Cloudfare Pages. 
+Clone this repo and use [Cloudflare Pages](https://pages.cloudflare.com/). 
 
 ## TODO 
 - Fix build to copy wasm files from node_modules to build to avoid having wasm files under source control.  
