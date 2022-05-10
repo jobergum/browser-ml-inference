@@ -7,13 +7,13 @@ This React App demonstrates ML Inference in the Browser using
 - [Huggingface](https://huggingface.co/bergum/xtremedistil-l6-h384-go-emotion) for NLP model hosting and training API (Transformer library) 
 - [Google Colab](https://colab.research.google.com/) for model training using GPU instances 
 
-Live demo at [https://aiserv.cloud/](https://aiserv.cloud/) 
+Live demo at [https://aiserv.cloud/](https://aiserv.cloud/). 
 
 <p align="center">
   <img src="GoEmotions.gif" />
 </p>
 
-See also my blog post [Moving ML Inference from the Cloud to the Edge](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4).
+See also my blog post [Moving ML Inference from the Cloud to the Edge](https://bergum.medium.com/moving-ml-inference-from-the-cloud-to-the-edge-d6f98dbdb2e3?source=friends_link&sk=e8183a3a8c10077110952b213ba5bef4) and [Deploy Transformer Models in the Browser with #ONNXRuntime on YouTube](https://www.youtube.com/watch?v=W_lUGPMW_Eg). 
 
 The emotion prediction model is a fine-tuned version of the pre-trained language model 
 [microsoft/xtremedistil-l6-h384-uncased](https://huggingface.co/microsoft/xtremedistil-l6-h384-uncased). 
