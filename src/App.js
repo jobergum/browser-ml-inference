@@ -12,7 +12,7 @@ class TextInputArea extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: 'Enter text to classify emotion, model trained on English text',
+      text: 'Enter text to classify emotion, model trained on English text.',
       data:columnNames,
       latency:0.0,
       downloading:modelDownloadInProgress()
@@ -23,7 +23,7 @@ class TextInputArea extends React.Component {
   componentDidMount() {
     this.timerID = setInterval(
       () => this.checkModelStatus(),
-      2000
+      1000
     );
   }
 
@@ -53,7 +53,7 @@ class TextInputArea extends React.Component {
     return (
       <div className="App">
       <header className="App-header">   
-      <em>In-Browser NLP Inference</em>
+      <em>In-Browser Transformer Inference</em>
       <Chart  
         width={'400px'}
         height={'200px'}
@@ -95,7 +95,8 @@ class TextInputArea extends React.Component {
        placeholder={this.state.text} autoFocus onChange={this.handleChange}>
       </textarea>
        <div><font size="3">Inference Latency {this.state.latency} ms</font></div>
-      <div><font size="3"><a href="https://github.com/jobergum/browser-ml-inference">Github browser-ml-inference </a></font></div>
+      <div><font size="3">GitHub Repo: <a href="https://github.com/jobergum/browser-ml-inference">browser-ml-inference</a></font></div>
+      <div><font size="3">Model was trained on the <a href="https://ai.googleblog.com/2021/10/goemotions-dataset-for-fine-grained.html">GoEmotions</a> dataset.</font></div>
       </header>
     </div>   
     );

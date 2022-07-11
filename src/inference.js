@@ -21,7 +21,7 @@ const model = "./xtremedistill-go-emotion-int8.onnx";
 const session = ort.InferenceSession.create(model, options);
 session.then(t => { 
   downLoadingModel = false;
-  //warmup the Virtual Machine tata
+  //warmup the VM
   for(var i = 0; i < 10; i++) {
     lm_inference("this is a warmup inference");
   }
@@ -122,12 +122,10 @@ async function lm_inference(text) {
     if(encoded_ids.length === 0) {
       return [0.0, EMOJI_DEFAULT_DISPLAY];
     }
-    const model_input = create_model_input(encoded_ids);
     const start = performance.now();
+    const model_input = create_model_input(encoded_ids);
     const output =  await session.then(s => { return s.run(model_input,['output_0'])});
     const duration = (performance.now() - start).toFixed(1);
-    //const sequence_length = model_input['input_ids'].size;
-    //console.log("Inference latency = " + duration + "ms, sequence_length=" + sequence_length);
     const probs = output['output_0'].data.map(sigmoid).map( t => Math.floor(t*100));
     
     const result = [];
