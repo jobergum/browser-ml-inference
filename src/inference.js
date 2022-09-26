@@ -3,12 +3,23 @@
 /*global BigInt64Array */
 
 import { loadTokenizer } from './bert_tokenizer.ts';
+import * as wasmFeatureDetect from 'wasm-feature-detect';
 
 //Setup onnxruntime 
 const ort = require('onnxruntime-web');
 //requires Cross-Origin-*-policy headers https://web.dev/coop-coep/
-ort.env.wasm.numThreads = 3; 
-ort.env.wasm.simd = true;
+
+const simdResolver = wasmFeatureDetect.simd().then(simdSupported => {
+    console.log("simd is supported? "+ simdSupported);
+    if (simdSupported) {
+      ort.env.wasm.numThreads = 3; 
+      ort.env.wasm.simd = true;
+    } else {
+      ort.env.wasm.numThreads = 1; 
+      ort.env.wasm.simd = false;
+    }
+});
+
 
 const options = {
   executionProviders: ['wasm'], 
@@ -19,13 +30,14 @@ var downLoadingModel = true;
 const model = "./xtremedistill-go-emotion-int8.onnx";
 
 const session = ort.InferenceSession.create(model, options);
-session.then(t => { 
+simdResolver.then(session.then(t => { 
   downLoadingModel = false;
   //warmup the VM
   for(var i = 0; i < 10; i++) {
+    console.log("Inference warmup " + i);
     lm_inference("this is a warmup inference");
   }
-});
+}));
 
 const tokenizer = loadTokenizer()
 
