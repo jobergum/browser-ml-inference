@@ -34,9 +34,10 @@ See [TrainGoEmotions.ipynb](TrainGoEmotions.ipynb ) for how to train a model on 
 ## ONNX-Runtime-web
 The model is quantized to int8 weights and has 22M trainable parameters and is 22MB large. Inference is multi-threaded. To use
 multiple inference threads, specific http headers must be presented by the CDN, see 
-[Making your website "cross-origin isolated" using COOP and COEP](https://web.dev/coop-coep/). Three threads are used for inference. 
+[Making your website "cross-origin isolated" using COOP and COEP](https://web.dev/coop-coep/). 
+Three threads are used for inference. 
 
-For development, the [src/setupProxy.js](src/setupProxy) adds the required headers. 
+For development, the [src/setupProxy.js](src/setupProxy.js) adds the required headers. 
 See [react issue 10210](https://github.com/facebook/create-react-app/issues/10210)
 
 ## Code Navigation
