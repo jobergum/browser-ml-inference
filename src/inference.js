@@ -7,8 +7,9 @@ import * as wasmFeatureDetect from 'wasm-feature-detect';
 
 //Setup onnxruntime 
 const ort = require('onnxruntime-web');
-//requires Cross-Origin-*-policy headers https://web.dev/coop-coep/
 
+//requires Cross-Origin-*-policy headers https://web.dev/coop-coep/
+/**
 const simdResolver = wasmFeatureDetect.simd().then(simdSupported => {
     console.log("simd is supported? "+ simdSupported);
     if (simdSupported) {
@@ -19,7 +20,7 @@ const simdResolver = wasmFeatureDetect.simd().then(simdSupported => {
       ort.env.wasm.simd = false;
     }
 });
-
+*/
 
 const options = {
   executionProviders: ['wasm'], 
@@ -30,14 +31,14 @@ var downLoadingModel = true;
 const model = "./xtremedistill-go-emotion-int8.onnx";
 
 const session = ort.InferenceSession.create(model, options);
-simdResolver.then(session.then(t => { 
+session.then(t => { 
   downLoadingModel = false;
   //warmup the VM
   for(var i = 0; i < 10; i++) {
     console.log("Inference warmup " + i);
     lm_inference("this is a warmup inference");
   }
-}));
+});
 
 const tokenizer = loadTokenizer()
 
