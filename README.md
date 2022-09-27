@@ -17,7 +17,8 @@ See also my blog post [Moving ML Inference from the Cloud to the Edge](https://b
 
 The emotion prediction model is a fine-tuned version of the pre-trained language model 
 [microsoft/xtremedistil-l6-h384-uncased](https://huggingface.co/microsoft/xtremedistil-l6-h384-uncased). 
-The model has been fine-tuned on the [GoEmotions dataset](https://ai.googleblog.com/2021/10/goemotions-dataset-for-fine-grained.html) which is a multi-label 
+The model has been fine-tuned on the 
+[GoEmotions dataset](https://ai.googleblog.com/2021/10/goemotions-dataset-for-fine-grained.html) which is a multi-label 
 text categorization problem. 
 
 
@@ -26,16 +27,20 @@ text categorization problem.
 Paper [GoEmotions: A Dataset of Fine-Grained Emotions](https://arxiv.org/pdf/2005.00547.pdf)
 
 - The fine-tuned model is hosted on [Huggingface:bergum/xtremedistil-l6-h384-go-emotion](https://huggingface.co/bergum/xtremedistil-l6-h384-go-emotion). 
-- The dataset is available on [Huggingface dataset hub](https://huggingface.co/datasets/go_emotions). 
+- The `go_emotions` dataset is available on [Huggingface dataset hub](https://huggingface.co/datasets/go_emotions). 
 
 See [TrainGoEmotions.ipynb](TrainGoEmotions.ipynb ) for how to train a model on the dataset and export the fine-tuned model to ONNX. 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jobergum/emotion/blob/main/TrainGoEmotions.ipynb)
 
 ## ONNX-Runtime-web
-The model is quantized to int8 weights and has 22M trainable parameters and is 22MB large. Inference is multi-threaded. To use
+The model is quantized to `int8` weights and has 22M trainable parameters. 
+
+Inference is multi-threaded. To use
 multiple inference threads, specific http headers must be presented by the CDN, see 
 [Making your website "cross-origin isolated" using COOP and COEP](https://web.dev/coop-coep/). 
-Three threads are used for inference. 
+
+Three threads are used for inference. Due to this [bug](https://github.com/microsoft/onnxruntime/issues/11679) 
+multi-threading and COOP headers had to be disabled as the model would silently fail to initialize on IOS devices.
 
 For development, the [src/setupProxy.js](src/setupProxy.js) adds the required headers. 
 See [react issue 10210](https://github.com/facebook/create-react-app/issues/10210)
